@@ -1,5 +1,8 @@
 package com.example.sharedelementtransitionsjetpackcompose.ui
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +19,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun ListScreen(
+fun SharedTransitionScope.ListScreen(
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -43,13 +48,26 @@ fun ListScreen(
                 AsyncImage(
                     model = url,
                     modifier = Modifier
-                        .size(100.dp),
+                        .size(100.dp)
+                        .sharedElement(
+                            state = rememberSharedContentState(
+                                key = "image-$url"
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                        ),
                     contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
                 Spacer(Modifier.size(16.dp))
                 LoremIpsum(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .sharedBounds(
+                            rememberSharedContentState(
+                                key = "text-$url"
+                            ),
+                            animatedVisibilityScope,
+                        ),
                     maxLines = 3,
                 )
             }
